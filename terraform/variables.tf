@@ -22,3 +22,8 @@ variable "terraform_admin_user_iam_name"{
 variable "github_repo_url"{
   type        = string
 }
+
+variable "vpc_cidr" {
+  description = "CIDR for vpc"
+  type       = string
+}
