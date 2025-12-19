@@ -37,3 +37,8 @@ variable "kubernetes_cluster_version" {
   type        = string
   default     =  "1.34"
 }
+
+variable "backend_bucket_name" {
+  type = string
+  default = "woc-terraform-backend-bucket"
+}
