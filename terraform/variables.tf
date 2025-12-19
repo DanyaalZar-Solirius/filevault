@@ -27,3 +27,13 @@ variable "vpc_cidr" {
   description = "CIDR for vpc"
   type       = string
 }
+
+variable "kubernetes_cluster_name" {
+  description = "Name of our kubernetes cluster"
+  type        = string
+}
+
+variable "kubernetes_cluster_version" {
+  type        = string
+  default     =  "1.34"
+}
