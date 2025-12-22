@@ -58,7 +58,14 @@ resource "aws_iam_role" "github_action_role" {
             "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
           }
         }
-      }
+      },
+    {
+        "Effect": "Allow",
+        "Principal": {
+            "AWS": "arn:aws:iam::437670317444:user/terraform-admin"
+        },
+        "Action": "sts:AssumeRole"
+    }
     ]
   })
 }
