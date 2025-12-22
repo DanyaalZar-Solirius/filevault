@@ -14,5 +14,5 @@ spec:
     spec:
       containers:
         - name: vault-frontend
-          image: vault-frontend:latest
+          image: 437670317444.dkr.ecr.eu-west-2.amazonaws.com/vault-app-repo-frontend:${GITHUB_SHA}
 

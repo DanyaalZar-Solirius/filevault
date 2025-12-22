@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: vault-backend
-          image: vault-backend:latest
+          image: 437670317444.dkr.ecr.eu-west-2.amazonaws.com/vault-app-repo-backend:${GITHUB_SHA}
           envFrom:
             - configMapRef:
                 name: backend-config
