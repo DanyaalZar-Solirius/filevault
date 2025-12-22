@@ -13,7 +13,7 @@ env:
   EKS_CLUSTER_NAME: vault-file-app-cluster
 
 jobs:
-  deploy:
+  deploy_docker_images::
     runs-on: ubuntu-latest
 
     steps:
@@ -45,41 +45,46 @@ jobs:
           BACKEND_IMAGE=${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/vault-app-repo-backend:${{ github.sha }}
           docker build -t $BACKEND_IMAGE ./src
           docker push $BACKEND_IMAGE
+      
+    deploy_kubernetes_resources:
+      runs-on: ubuntu-latest
+      needs: deploy_docker_images
 
-      # # 6. Configure kubectl for EKS
-      # - name: Update kubeconfig
-      #   run: |
-      #     aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --region $AWS_REGION
+      steps:
+      # 1. Configure kubectl for EKS
+        - name: Update kubeconfig
+          run: |
+            aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --region $AWS_REGION
 
-      # # 7. Apply ConfigMaps (non-sensitive config)
-      # - name: Apply ConfigMaps
-      #   run: |
-      #     kubectl apply -f k8s/configmaps/
+        # 2. Apply ConfigMaps (non-sensitive config)
+        - name: Apply ConfigMaps
+          run: |
+            kubectl apply -f k8s/configmaps/
 
-      # # 8. Apply Secrets from GitHub Secrets
-      # - name: Apply backend secrets
-      #   run: |
-      #     kubectl create secret generic backend-secrets \
-      #       --from-literal=DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
-      #       --from-literal=JWT_SECRET=${{ secrets.JWT_SECRET }} \
-      #       --dry-run=client -o yaml | kubectl apply -f -
+        # 3. Apply Secrets from GitHub Secrets
+        - name: Apply backend secrets
+          run: |
+            kubectl create secret generic backend-secrets \
+              --from-literal=DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+              --from-literal=JWT_SECRET=${{ secrets.JWT_SECRET }} \
+              --dry-run=client -o yaml | kubectl apply -f -
 
-      # # 9. Deploy new images to frontend and backend
-      # - name: Deploy to EKS
-      #   run: |
-      #     kubectl set image deployment/frontend \
-      #       frontend=${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/vault-app-repo-frontend:${{ github.sha }}
-      #     kubectl set image deployment/backend \
-      #       backend=${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/vault-app-repo-backend:${{ github.sha }}
+        # 4. Deploy new images to frontend and backend
+        - name: Deploy to EKS
+          run: |
+            kubectl set image deployment/vault-frontend \
+              vault-frontend=${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/vault-app-repo-frontend:${{ github.sha }}
+            kubectl set image deployment/vault-backend \
+              vault-backend=${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/vault-app-repo-backend:${{ github.sha }}
 
-      # # 10. Restart deployments to pick up secrets/config changes
-      # - name: Restart deployments
-      #   run: |
-      #     kubectl rollout restart deployment/frontend
-      #     kubectl rollout restart deployment/backend
+        # 5. Restart deployments to pick up secrets/config changes
+        - name: Restart deployments
+          run: |
+            kubectl rollout restart deployment/vault-frontend
+            kubectl rollout restart deployment/vault-backend
 
-      # # 11. Verify rollout status
-      # - name: Verify rollout
-      #   run: |
-      #     kubectl rollout status deployment/frontend
-      #     kubectl rollout status deployment/backend
+        # 6. Verify rollout status
+        - name: Verify rollout
+          run: |
+            kubectl rollout status deployment/vault-frontend
+            kubectl rollout status deployment/vault-backend
