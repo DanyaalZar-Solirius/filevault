@@ -42,3 +42,4 @@ variable "backend_bucket_name" {
   type = string
   default = "woc-terraform-backend-bucket"
 }
+
