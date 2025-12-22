@@ -75,6 +75,10 @@ jobs:
             --from-literal=JWT_SECRET=${{ secrets.JWT_SECRET }} \
             --dry-run=client -o yaml | kubectl apply -f -
 
+      - name: Apply Services
+        run: |
+          kubectl apply -f k8s/services/
+
       - name: Apply Deployments
         run: |
           kubectl apply -f k8s/deployments/frontend-deployment.yml
