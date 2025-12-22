@@ -30,6 +30,6 @@ resource "aws_iam_user_policy_attachment" "app_user_attach" {
   policy_arn = aws_iam_policy.app_policy.arn
 }
 
-# resource "aws_iam_access_key" "app_user_key" {
-#   user = aws_iam_user.app_user.name
-# }
+resource "aws_iam_access_key" "app_user_key" {
+  user = aws_iam_user.app_user.name
+}
