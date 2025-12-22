@@ -3,6 +3,6 @@ kind: ConfigMap
 metadata:
   name: backend-config
 data:
-  AWS_REGION=eu-west-2
-  S3_BUCKET_NAME=woc-filevault-bucket
-  PORT=3000
+  AWS_REGION: eu-west-2
+  S3_BUCKET_NAME: woc-filevault-bucket
+  PORT: 3000
