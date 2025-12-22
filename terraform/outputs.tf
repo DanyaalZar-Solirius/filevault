@@ -7,11 +7,7 @@ output "vault_app_backend_repo_arn" {
     value = aws_ecr_repository.vault_app_backend_repo.arn
 }
 
-//vpc
-# output "vpc_id" {
-#     value = module.vpc.vpc_id
-# } 
-
-# output "vpc_private_subnet_ids" {
-#   value = module.vpc.private_subnets
-# }
+//app user access key id
+output "aws_iam_access_key_id" {
+    value = aws_iam_access_key.app_user_key.id
+}
