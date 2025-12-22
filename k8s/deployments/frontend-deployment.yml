@@ -16,5 +16,5 @@ spec:
         - name: vault-frontend
           image: 437670317444.dkr.ecr.eu-west-2.amazonaws.com/vault-app-repo-frontend:${GITHUB_SHA}
           ports:
-            - containerPort: 3000 
+            - containerPort: 80
 
