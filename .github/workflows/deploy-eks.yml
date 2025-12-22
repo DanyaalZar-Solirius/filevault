@@ -51,17 +51,28 @@ jobs:
     needs: deploy_docker_images
 
     steps:
-    # 1. Configure kubectl for EKS
+      # 1. Checkout repository
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      # 2. Authenticate to AWS via OIDC
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::437670317444:role/GitHubActionRole
+          aws-region: ${{ env.AWS_REGION }}
+
+    # 3. Configure kubectl for EKS
       - name: Update kubeconfig
         run: |
           aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --region $AWS_REGION
 
-      # 2. Apply ConfigMaps (non-sensitive config)
+      # 4. Apply ConfigMaps (non-sensitive config)
       - name: Apply ConfigMaps
         run: |
           kubectl apply -f k8s/configmaps/
 
-      # 3. Apply Secrets from GitHub Secrets
+      # 5. Apply Secrets from GitHub Secrets
       - name: Apply backend secrets
         run: |
           kubectl create secret generic backend-secrets \
@@ -69,7 +80,7 @@ jobs:
             --from-literal=JWT_SECRET=${{ secrets.JWT_SECRET }} \
             --dry-run=client -o yaml | kubectl apply -f -
 
-      # 4. Deploy new images to frontend and backend
+      # 6. Deploy new images to frontend and backend
       - name: Deploy to EKS
         run: |
           kubectl set image deployment/vault-frontend \
@@ -77,13 +88,13 @@ jobs:
           kubectl set image deployment/vault-backend \
             vault-backend=${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/vault-app-repo-backend:${{ github.sha }}
 
-      # 5. Restart deployments to pick up secrets/config changes
+      # 7. Restart deployments to pick up secrets/config changes
       - name: Restart deployments
         run: |
           kubectl rollout restart deployment/vault-frontend
           kubectl rollout restart deployment/vault-backend
 
-      # 6. Verify rollout status
+      # 8. Verify rollout status
       - name: Verify rollout
         run: |
           kubectl rollout status deployment/vault-frontend
