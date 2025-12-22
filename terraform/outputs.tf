@@ -14,4 +14,5 @@ output "aws_iam_access_key_id" {
 
 output "aws_iam_access_key_secret" {
     value = aws_iam_access_key.app_user_key.secret
+    sensitive = true
 }
