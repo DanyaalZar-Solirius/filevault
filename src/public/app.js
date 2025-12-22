@@ -19,7 +19,7 @@ document.getElementById('noteForm').addEventListener('submit', async function(e)
   formData.append('note', note);
   formData.append('file', file);
 
-  const response = await fetch('/upload', {
+  const response = await fetch('http://vault-backend:3000/upload', {
       method: 'POST',
       body: formData
   });
@@ -35,7 +35,7 @@ document.getElementById('noteForm').addEventListener('submit', async function(e)
 });
 
 async function loadFiles() {
-  const response = await fetch('/files');
+  const response = await fetch('http://vault-backend:3000/files');
   const files = await response.json();
 
   const notesList = document.getElementById('notesList');
@@ -67,7 +67,7 @@ async function loadFiles() {
 }
 
 async function deleteFile(fileKey) {
-  const response = await fetch(`/files/${fileKey}`, {
+  const response = await fetch(`http://vault-backend:3000/files/${fileKey}`, {
       method: 'DELETE',
   });
 
