@@ -71,8 +71,8 @@ jobs:
       - name: Apply backend secrets
         run: |
           kubectl create secret generic backend-secrets \
-            --from-literal=DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
-            --from-literal=JWT_SECRET=${{ secrets.JWT_SECRET }} \
+            --from-literal=AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} \
+            --from-literal=AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} \
             --dry-run=client -o yaml | kubectl apply -f -
 
       - name: Apply Services
