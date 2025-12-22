@@ -1,31 +1,33 @@
-# data "aws_availability_zones" "available" {}
+# Filter out local zones, which are not currently supported 
+# with managed node groups
+data "aws_availability_zones" "available" {
+  filter {
+    name   = "opt-in-status"
+    values = ["opt-in-not-required"]
+  }
+}
 
-# module "vpc" {
-#   source  = "terraform-aws-modules/vpc/aws"
-#   version = "~> 6.0"
+module "vpc" {
+  source  = "terraform-aws-modules/vpc/aws"
+  version = "5.8.1"
 
-#   name = "eks-vpc"
-#   cidr = var.vpc_cidr
+  name = "eks-vpc"
 
-#   azs             = data.aws_availability_zones.available.names
-#   public_subnets  = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
-#   private_subnets = ["10.0.11.0/24", "10.0.12.0/24", "10.0.13.0/24"]
+  cidr = "10.0.0.0/16"
+  azs  = slice(data.aws_availability_zones.available.names, 0, 3)
 
-#   enable_nat_gateway     = true
-#   single_nat_gateway     = true
+  private_subnets = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
+  public_subnets  = ["10.0.4.0/24", "10.0.5.0/24", "10.0.6.0/24"]
 
-#   # These tags are critical for EKS to work properly
-#   public_subnet_tags = {
-#     "kubernetes.io/role/elb" = "1"
-#     "kubernetes.io/cluster/${var.kubernetes_cluster_name}" = "shared"
-#   }
+  enable_nat_gateway   = true
+  single_nat_gateway   = true
+  enable_dns_hostnames = true
 
-#   private_subnet_tags = {
-#     "kubernetes.io/role/internal-elb" = "1"
-#     "kubernetes.io/cluster/${var.kubernetes_cluster_name}" = "shared"
-#   }
+  public_subnet_tags = {
+    "kubernetes.io/role/elb" = 1
+  }
 
-#   tags = {
-#     "Name" = "eks-vpc"
-#   }
-# }
+  private_subnet_tags = {
+    "kubernetes.io/role/internal-elb" = 1
+  }
+}
