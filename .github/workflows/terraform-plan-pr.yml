@@ -37,6 +37,18 @@ jobs:
         working-directory: terraform
         run: terraform init -input=false
 
+      - name: Terraform Validate
+        working-directory: terraform
+        run: terraform validate
+
+      - name: Setup TFLint
+        uses: terraform-linters/setup-tflint@v4
+
+      - name: Run TFLint
+        working-directory: terraform
+        run: tflint --init && tflint
+
+
       - name: Terraform Plan
         working-directory: terraform
         run: terraform plan -no-color
